@@ -11,7 +11,6 @@
     <SplitPane dividerPositions="0.25" AnchorPane.topAnchor="0" AnchorPane.bottomAnchor="0"
                AnchorPane.leftAnchor="0" AnchorPane.rightAnchor="0">
 
-        <!-- ЛЕВОЕ МЕНЮ -->
         <VBox spacing="10" prefWidth="200" style="-fx-padding: 10;">
             <Button text="Задание 1" fx:id="task1Button" onAction="#onTask1"/>
             <Button text="Задание 2" fx:id="task2Button" onAction="#onTask2"/>
@@ -21,10 +20,8 @@
             <Button text="Задание 6" fx:id="task6Button" onAction="#onTask6"/>
         </VBox>
 
-        <!-- ПРАВАЯ ЧАСТЬ -->
         <VBox spacing="15" style="-fx-padding: 10;">
 
-            <!-- ВВОД МАССИВА -->
             <TitledPane text="Ввод массива" expanded="true">
                 <VBox spacing="10" style="-fx-padding: 10;">
 
@@ -35,19 +32,16 @@
                             <ColumnConstraints halignment="LEFT" minWidth="120"/>
                         </columnConstraints>
 
-                        <!-- Размер массива -->
                         <Label text="Размер массива:" GridPane.rowIndex="0" GridPane.columnIndex="0"/>
                         <TextField fx:id="arraySizeField" promptText="например, 10"
                                    GridPane.rowIndex="0" GridPane.columnIndex="1"/>
 
-                        <!-- Диапазон -->
                         <Label text="Диапазон:" GridPane.rowIndex="1" GridPane.columnIndex="0"/>
                         <TextField fx:id="minValueField" promptText="min"
                                    GridPane.rowIndex="1" GridPane.columnIndex="1"/>
                         <TextField fx:id="maxValueField" promptText="max"
                                    GridPane.rowIndex="1" GridPane.columnIndex="2"/>
 
-                        <!-- Кнопки генерации -->
                         <Button text="Сгенерировать 1D" fx:id="generate1DButton"
                                 onAction="#onGenerate1D"
                                 GridPane.rowIndex="2" GridPane.columnIndex="0"/>
@@ -57,12 +51,10 @@
                                 GridPane.rowIndex="2" GridPane.columnIndex="1"/>
                     </GridPane>
 
-                    <!-- Поле массива -->
                     <TextArea fx:id="inputArrayArea" prefRowCount="4" wrapText="true"/>
                 </VBox>
             </TitledPane>
 
-            <!-- РЕЗУЛЬТАТ -->
             <TitledPane text="Результат" expanded="true">
                 <VBox spacing="10" style="-fx-padding: 10;">
                     <Label text="Описание задания:"/>

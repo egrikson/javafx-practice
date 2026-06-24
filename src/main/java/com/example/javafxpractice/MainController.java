@@ -251,12 +251,160 @@ public class MainController {
         );
     }
 
+    private void runTask2() {
+        int firstNegIdx = -1;
+        int arr[] = currentArray;
+
+        if (arr == null || arr.length == 0) {
+            resultArea.setText("Сначала сгенерируйте массив");
+            return;
+        }
+
+        // находим первый отрицательный элемент
+        for (int i = 0; i < arr.length; i++) {
+            if (arr[i] < 0) {
+                firstNegIdx = i;
+                break;
+            }
+        }
+
+        int maxSeriesStart = -1;
+        int maxSeriesLen = 0;
+
+        int i = 0;
+        while(i < arr.length) {
+            if (arr[i] % 2 == 0) {
+                int count = 1;
+                while (i + count < arr.length && arr[i + count] % 2 == 0) {
+                    count++;
+                }
+                if (count >= 2 && count > maxSeriesLen) {
+                    maxSeriesLen = count;
+                    maxSeriesStart = i;
+                }
+                i += count;
+            } else {
+                i++;
+            }
+        }
+
+        // ===== ПРОВЕРКИ =====
+        if (firstNegIdx == -1) {
+            resultArea.setText("В массиве нет отрицательных элементов");
+            return;
+        }
+
+        if (maxSeriesStart == -1) {
+            resultArea.setText("В массиве нет серий из четных элементов длиной >= 2");
+            return;
+        }
+
+        int insertPos = firstNegIdx + 1;
+        if (insertPos + maxSeriesLen > arr.length) {
+            resultArea.setText(
+                    "Первый отрицательный элемент: индекс = " + firstNegIdx + ", значение = " + arr[firstNegIdx] + "\n" +
+                            "Серия с наибольшей длиной: позиция = " + maxSeriesStart + ", длина = " + maxSeriesLen + "\n\n" +
+                            "Недостаточно места после первого отрицательного элемента для вставки серии"
+            );
+            return;
+        }
+
+        // ===== ВСТАВКА =====
+        // Запоминаем серию до сдвига
+        int[] series = new int[maxSeriesLen];
+        for (int j = 0; j < maxSeriesLen; j++) {
+            series[j] = arr[maxSeriesStart + j];
+        }
+
+        // Сдвигаем элементы вправо начиная с конца
+        for (int j = arr.length - 1; j >= insertPos + maxSeriesLen; j--) {
+            arr[j] = arr[j - maxSeriesLen];
+        }
+
+        // Копируем серию на нужное место
+        for (int j = 0; j < maxSeriesLen; j++) {
+            arr[insertPos + j] = series[j];
+        }
+
+        // ===== ВЫВОД =====
+        StringBuilder sb = new StringBuilder();
+        sb.append("Первый отрицательный элемент: индекс = ").append(firstNegIdx)
+                .append(", значение = ").append(arr[firstNegIdx]).append("\n");
+        sb.append("Серия с наибольшей длиной: позиция = ").append(maxSeriesStart)
+                .append(", длина = ").append(maxSeriesLen).append("\n\n");
+        sb.append("Массив после вставки:\n");
+        for (int j = 0; j < arr.length; j++) {
+            sb.append(arr[j]);
+            if (j < arr.length - 1) sb.append(", ");
+        }
+
+        resultArea.setText(sb.toString());
+    }
+
+    private void runTaskX() {
+        int[] arr = currentArray;
+
+        if (arr == null || arr.length < 2) {
+            resultArea.setText("Сначала сгенерируйте массив");
+            return;
+        }
+
+        int N = arr.length;
+        int i = 0;
+
+        while (i < N - 1) {
+
+            // Проверяем, начинается ли серия
+            if ((arr[i] % 2 == 0 && arr[i + 1] % 2 == 0) ||
+                    (arr[i] % 2 != 0 && arr[i + 1] % 2 != 0)) {
+
+                int start = i;
+                int len = 1;
+
+                // Считаем длину серии
+                while (i < N - 1 &&
+                        ((arr[i] % 2 == 0 && arr[i + 1] % 2 == 0) ||
+                                (arr[i] % 2 != 0 && arr[i + 1] % 2 != 0))) {
+                    len++;
+                    i++;
+                }
+
+                // Если серия меньше 2 — пропускаем
+                if (len < 2) {
+                    i++;
+                    continue;
+                }
+
+                // Вставляем первый элемент серии в её конец
+                int insertPos = start + len;
+                int value = arr[start];
+
+                // Сдвиг вправо
+                for (int j = N - 1; j > insertPos; j--) {
+                    arr[j] = arr[j - 1];
+                }
+
+                // Вставка
+                arr[insertPos] = value;
+
+                // Пропускаем вставленный элемент
+                i = insertPos + 1;
+
+            } else {
+                i++;
+            }
+        }
+
+        resultArea.setText("Готово! Массив после обработки:\n" + Arrays.toString(arr));
+    }
+
     // ===== ВЫПОЛНЕНИЕ ЗАДАНИЯ =====
 
     @FXML
     private void onExecute() {
         switch (currentTask) {
             case 1 -> runTask1();
+            case 2 -> runTask2();
         }
     }
 }

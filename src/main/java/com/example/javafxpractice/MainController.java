@@ -341,7 +341,7 @@ public class MainController {
         resultArea.setText(sb.toString());
     }
 
-    private void runTaskX() {
+    private void runTask3() {
         int[] arr = currentArray;
 
         if (arr == null || arr.length < 2) {
@@ -398,6 +398,17 @@ public class MainController {
         resultArea.setText("Готово! Массив после обработки:\n" + Arrays.toString(arr));
     }
 
+    private void rubTask4() {
+
+    }
+
+    private void rubTask5() {
+
+    }
+
+    private void rubTask6() {
+
+    }
     // ===== ВЫПОЛНЕНИЕ ЗАДАНИЯ =====
 
     @FXML
@@ -405,6 +416,8 @@ public class MainController {
         switch (currentTask) {
             case 1 -> runTask1();
             case 2 -> runTask2();
+            case 3 -> runTask3();
+
         }
     }
 }

@@ -250,7 +250,6 @@ public class MainController {
 
         int N = arr.length;
 
-        // === 1. Найти первый отрицательный элемент ===
         int firstNeg = -1;
         for (int i = 0; i < N; i++) {
             if (arr[i] < 0) {
@@ -263,7 +262,6 @@ public class MainController {
             return;
         }
 
-        // === 2. Найти самую длинную серию чётных элементов ===
         int bestStart = -1, bestLen = 0;
 
         int i = 0;
@@ -288,31 +286,24 @@ public class MainController {
             return;
         }
 
-        // === 3. Проверить, хватает ли места после первого отрицательного ===
-        // Нужно: firstNeg + 1 + bestLen <= N
         if (firstNeg + 1 + bestLen > N) {
             resultArea.setText("Недостаточно места после первого отрицательного элемента");
             return;
         }
 
-        // === 4. Сохранить серию во временный буфер ===
         int[] temp = new int[bestLen];
         for (int k = 0; k < bestLen; k++) {
             temp[k] = arr[bestStart + k];
         }
 
-        // === 5. Удалить серию со старого места (сдвиг влево) ===
         for (int j = bestStart; j < N - bestLen; j++) {
             arr[j] = arr[j + bestLen];
         }
 
-        // === 6. Вставить серию после первого отрицательного (сдвиг вправо) ===
-        // Сдвигаем вправо участок [firstNeg+1 .. N-bestLen-1]
         for (int j = N - bestLen - 1; j >= firstNeg + 1; j--) {
             arr[j + bestLen] = arr[j];
         }
 
-        // === 7. Вставляем сохранённую серию ===
         for (int k = 0; k < bestLen; k++) {
             arr[firstNeg + 1 + k] = temp[k];
         }
@@ -332,14 +323,12 @@ public class MainController {
         int i = 0;
         while (i < N - 1) {
 
-            // Проверяем начало серии
             if ((arr[i] % 2 == 0 && arr[i + 1] % 2 == 0) ||
                     (arr[i] % 2 != 0 && arr[i + 1] % 2 != 0)) {
 
                 int start = i;
                 int len = 1;
 
-                // Находим длину серии
                 while (i + len < N &&
                         ((arr[i + len] % 2 == 0 && arr[i + len - 1] % 2 == 0) ||
                                 (arr[i + len] % 2 != 0 && arr[i + len - 1] % 2 != 0))) {
@@ -347,24 +336,16 @@ public class MainController {
                 }
 
                 if (len >= 2) {
-                    // Нужно вставить arr[start] в позицию start + len
-                    // Но сначала — сдвиг вправо
-
-                    // Увеличиваем массив на 1 (это допустимо, т.к. сам сдвиг делаем вручную)
                     arr = Arrays.copyOf(arr, N + 1);
 
-                    // Сдвигаем вправо хвост
                     for (int j = N; j > start + len; j--) {
                         arr[j] = arr[j - 1];
                     }
 
-                    // Вставляем первый элемент серии
                     arr[start + len] = arr[start];
 
-                    // Обновляем длину массива
                     N++;
 
-                    // Перескакиваем через вставленную серию
                     i = start + len + 1;
                 } else {
                     i++;
@@ -427,7 +408,6 @@ public class MainController {
         resultArea.setText(Arrays.toString(trimmed));
     }
 
-
     private void runTask5() {
         int[][] a = currentMatrix;
         if (a == null) {
@@ -437,7 +417,6 @@ public class MainController {
 
         int N = a.length;
 
-        // === 1. Найти первый столбец с положительным элементом ===
         int firstPos = -1;
         for (int c = 0; c < N; c++) {
             for (int r = 0; r < N; r++) {
@@ -449,7 +428,6 @@ public class MainController {
             if (firstPos != -1) break;
         }
 
-        // === 2. Найти последний столбец с отрицательным элементом ===
         int lastNeg = -1;
         for (int c = N - 1; c >= 0; c--) {
             for (int r = 0; r < N; r++) {
@@ -466,19 +444,16 @@ public class MainController {
             return;
         }
 
-        // === 3. Считаем сумму столбцов ===
         int s1 = 0, s2 = 0;
         for (int r = 0; r < N; r++) s1 += a[r][firstPos];
         for (int r = 0; r < N; r++) s2 += a[r][lastNeg];
         int val = Math.abs(s1 - s2);
 
-        int cols = N; // текущее количество столбцов
+        int cols = N;
 
-        // === 4. Проходим по столбцам и вставляем новые ===
         int c = 0;
         while (c < cols) {
 
-            // считаем количество чётных в столбце
             int even = 0;
             for (int r = 0; r < N; r++) {
                 if (a[r][c] % 2 == 0) even++;
@@ -486,25 +461,22 @@ public class MainController {
 
             if (even > 3) {
 
-                // === 4.1 Расширяем каждую строку на 1 столбец ===
                 for (int r = 0; r < N; r++) {
                     a[r] = Arrays.copyOf(a[r], cols + 1);
                 }
 
-                // === 4.2 Сдвигаем вправо столбцы справа от c ===
                 for (int r = 0; r < N; r++) {
                     for (int j = cols; j > c + 1; j--) {
                         a[r][j] = a[r][j - 1];
                     }
                 }
 
-                // === 4.3 Вставляем новый столбец ===
                 for (int r = 0; r < N; r++) {
                     a[r][c + 1] = val;
                 }
 
-                cols++;   // увеличилось количество столбцов
-                c += 2;   // пропускаем вставленный столбец
+                cols++;
+                c += 2;
             } else {
                 c++;
             }
@@ -512,7 +484,6 @@ public class MainController {
 
         currentMatrix = a;
 
-        // === вывод ===
         StringBuilder sb = new StringBuilder();
         for (int r = 0; r < N; r++) {
             for (int j = 0; j < cols; j++) {

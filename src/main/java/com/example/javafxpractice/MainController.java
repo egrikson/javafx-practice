@@ -5,12 +5,10 @@ import javafx.scene.control.Button;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 
-import java.util.Arrays;
-import java.util.Random;
+import java.util.*;
 
 public class MainController {
 
-    // Левое меню
     @FXML private Button task1Button;
     @FXML private Button task2Button;
     @FXML private Button task3Button;
@@ -18,7 +16,6 @@ public class MainController {
     @FXML private Button task5Button;
     @FXML private Button task6Button;
 
-    // Ввод массива
     @FXML private TextField arraySizeField;
     @FXML private TextField minValueField;
     @FXML private TextField maxValueField;
@@ -26,7 +23,6 @@ public class MainController {
     @FXML private Button generate2DButton;
     @FXML private TextArea inputArrayArea;
 
-    // Результат
     @FXML private TextArea taskDescriptionArea;
     @FXML private TextArea resultArea;
     @FXML private Button executeButton;
@@ -41,8 +37,6 @@ public class MainController {
         taskDescriptionArea.setEditable(false);
         resultArea.setEditable(false);
     }
-
-    // ===== КНОПКИ ЗАДАНИЙ =====
 
     @FXML
     private void onTask1() {
@@ -72,7 +66,7 @@ public class MainController {
         currentTask = 3;
         taskDescriptionArea.setText("Внимание! Делать с использованием операций сдвига, а не\n" +
                 "перестройкой массива!\n" +
-                "Дан целочисленный одномерный массив размера N. Серия – это\n" +
+                "23. Дан целочисленный одномерный массив размера N. Серия – это\n" +
                 "последовательность элементов массива, идущих друг за другом.\n" +
                 "Значения элементов серии либо все четные, либо все нечетные. Серия\n" +
                 "должна содержать минимум 2 элемента. Длина серии – количество\n" +
@@ -85,7 +79,7 @@ public class MainController {
         currentTask = 4;
         taskDescriptionArea.setText("Внимание! Делать с использованием операций сдвига, а не\n" +
                 "перестройкой массива!\n" +
-                "Дан целочисленный одномерный массив размера N. Серия – это\n" +
+                "23. Дан целочисленный одномерный массив размера N. Серия – это\n" +
                 "последовательность элементов массива, идущих друг за другом. Знаки\n" +
                 "значений всех элементов серии одинаковы (все положительные или все\n" +
                 "отрицательные). Серия должна содержать минимум 2 элемента. Длина\n" +
@@ -98,7 +92,7 @@ public class MainController {
         currentTask = 5;
         taskDescriptionArea.setText("Внимание! Делать с использованием операций сдвига, а не\n" +
                 "перестройкой массива!\n" +
-                "Дан целочисленный двумерный массив размера N*N. Добавить столбец,\n" +
+                "23. Дан целочисленный двумерный массив размера N*N. Добавить столбец,\n" +
                 "содержащий сумму по модулю между столбцами с первым\n" +
                 "положительным и последним отрицательным элементом после каждого\n" +
                 "столбца, в котором количество четных элементов больше 3.");
@@ -107,7 +101,7 @@ public class MainController {
     @FXML
     private void onTask6() {
         currentTask = 6;
-        taskDescriptionArea.setText(".Дан целочисленный двумерный массив размера N*N. Отсортировать\n" +
+        taskDescriptionArea.setText("23. Дан целочисленный двумерный массив размера N*N. Отсортировать\n" +
                 "матрицу по возрастанию ниже побочной диагонали. Направление: слева\n" +
                 "направо, сверху вниз.\n" +
                 "Пример:\n" +
@@ -119,8 +113,6 @@ public class MainController {
                 "4 7 3\n" +
                 "0 6 9\n");
     }
-
-    // ===== ГЕНЕРАЦИЯ МАССИВОВ =====
 
     @FXML
     private void onGenerate1D() {
@@ -189,7 +181,7 @@ public class MainController {
             inputArrayArea.setText("Ошибка! Введите корректные числа");
         }
     }
-    // ===== Логика заданий =====
+
     private void runTask1() {
         int[] arr = currentArray;
 
@@ -204,7 +196,6 @@ public class MainController {
         int lastStart = -1;
         int lastLength = 0;
 
-        // ===== ПОИСК ПЕРВОЙ СЕРИИ =====
         for (int i = 0; i < arr.length - 1; i++) {
             int count = 1;
 
@@ -220,7 +211,6 @@ public class MainController {
             }
         }
 
-        // ===== ПОИСК ПОСЛЕДНЕЙ СЕРИИ =====
         for (int i = arr.length - 1; i > 0; i--) {
             int count = 1;
 
@@ -236,7 +226,6 @@ public class MainController {
             }
         }
 
-        // ===== ВЫВОД =====
         if (firstStart == -1) {
             resultArea.setText("В массиве нет ни одной серии (подряд идущих одинаковых элементов)");
             return;
@@ -253,215 +242,260 @@ public class MainController {
     }
 
     private void runTask2() {
-        int firstNegIdx = -1;
-        int arr[] = currentArray;
-
+        int[] arr = currentArray;
         if (arr == null || arr.length == 0) {
             resultArea.setText("Сначала сгенерируйте массив");
             return;
         }
 
-        // находим первый отрицательный элемент
-        for (int i = 0; i < arr.length; i++) {
+        int N = arr.length;
+
+        int firstNeg = -1;
+        for (int i = 0; i < N; i++) {
             if (arr[i] < 0) {
-                firstNegIdx = i;
+                firstNeg = i;
                 break;
             }
         }
+        if (firstNeg == -1) {
+            resultArea.setText("В массиве нет отрицательных элементов");
+            return;
+        }
 
-        int maxSeriesStart = -1;
-        int maxSeriesLen = 0;
+        int bestStart = -1, bestLen = 0;
 
         int i = 0;
-        while(i < arr.length) {
+        while (i < N) {
             if (arr[i] % 2 == 0) {
-                int count = 1;
-                while (i + count < arr.length && arr[i + count] % 2 == 0) {
-                    count++;
+                int len = 1;
+                while (i + len < N && arr[i + len] % 2 == 0) len++;
+
+                if (len >= 2 && len > bestLen) {
+                    bestLen = len;
+                    bestStart = i;
                 }
-                if (count >= 2 && count > maxSeriesLen) {
-                    maxSeriesLen = count;
-                    maxSeriesStart = i;
-                }
-                i += count;
+
+                i += len;
             } else {
                 i++;
             }
         }
 
-        // ===== ПРОВЕРКИ =====
-        if (firstNegIdx == -1) {
-            resultArea.setText("В массиве нет отрицательных элементов");
+        if (bestStart == -1) {
+            resultArea.setText("Нет серий из чётных элементов длиной ≥ 2");
             return;
         }
 
-        if (maxSeriesStart == -1) {
-            resultArea.setText("В массиве нет серий из четных элементов длиной >= 2");
+        if (firstNeg + 1 + bestLen > N) {
+            resultArea.setText("Недостаточно места после первого отрицательного элемента");
             return;
         }
 
-        int insertPos = firstNegIdx + 1;
-        if (insertPos + maxSeriesLen > arr.length) {
-            resultArea.setText(
-                    "Первый отрицательный элемент: индекс = " + firstNegIdx + ", значение = " + arr[firstNegIdx] + "\n" +
-                            "Серия с наибольшей длиной: позиция = " + maxSeriesStart + ", длина = " + maxSeriesLen + "\n\n" +
-                            "Недостаточно места после первого отрицательного элемента для вставки серии"
-            );
-            return;
+        int[] temp = new int[bestLen];
+        for (int k = 0; k < bestLen; k++) {
+            temp[k] = arr[bestStart + k];
         }
 
-        // ===== ВСТАВКА =====
-        // Запоминаем серию до сдвига
-        int[] series = new int[maxSeriesLen];
-        for (int j = 0; j < maxSeriesLen; j++) {
-            series[j] = arr[maxSeriesStart + j];
+        for (int j = bestStart; j < N - bestLen; j++) {
+            arr[j] = arr[j + bestLen];
         }
 
-        // Сдвигаем элементы вправо начиная с конца
-        for (int j = arr.length - 1; j >= insertPos + maxSeriesLen; j--) {
-            arr[j] = arr[j - maxSeriesLen];
+        for (int j = N - bestLen - 1; j >= firstNeg + 1; j--) {
+            arr[j + bestLen] = arr[j];
         }
 
-        // Копируем серию на нужное место
-        for (int j = 0; j < maxSeriesLen; j++) {
-            arr[insertPos + j] = series[j];
+        for (int k = 0; k < bestLen; k++) {
+            arr[firstNeg + 1 + k] = temp[k];
         }
 
-        // ===== ВЫВОД =====
-        StringBuilder sb = new StringBuilder();
-        sb.append("Первый отрицательный элемент: индекс = ").append(firstNegIdx)
-                .append(", значение = ").append(arr[firstNegIdx]).append("\n");
-        sb.append("Серия с наибольшей длиной: позиция = ").append(maxSeriesStart)
-                .append(", длина = ").append(maxSeriesLen).append("\n\n");
-        sb.append("Массив после вставки:\n");
-        for (int j = 0; j < arr.length; j++) {
-            sb.append(arr[j]);
-            if (j < arr.length - 1) sb.append(", ");
-        }
-
-        resultArea.setText(sb.toString());
+        resultArea.setText(Arrays.toString(arr));
     }
 
     private void runTask3() {
         int[] arr = currentArray;
-
         if (arr == null || arr.length < 2) {
             resultArea.setText("Сначала сгенерируйте массив");
             return;
         }
 
         int N = arr.length;
-        int i = 0;
 
+        int i = 0;
         while (i < N - 1) {
 
-            // Проверяем, начинается ли серия
             if ((arr[i] % 2 == 0 && arr[i + 1] % 2 == 0) ||
                     (arr[i] % 2 != 0 && arr[i + 1] % 2 != 0)) {
 
                 int start = i;
                 int len = 1;
 
-                // Считаем длину серии
-                while (i < N - 1 &&
-                        ((arr[i] % 2 == 0 && arr[i + 1] % 2 == 0) ||
-                                (arr[i] % 2 != 0 && arr[i + 1] % 2 != 0))) {
+                while (i + len < N &&
+                        ((arr[i + len] % 2 == 0 && arr[i + len - 1] % 2 == 0) ||
+                                (arr[i + len] % 2 != 0 && arr[i + len - 1] % 2 != 0))) {
                     len++;
+                }
+
+                if (len >= 2) {
+                    arr = Arrays.copyOf(arr, N + 1);
+
+                    for (int j = N; j > start + len; j--) {
+                        arr[j] = arr[j - 1];
+                    }
+
+                    arr[start + len] = arr[start];
+
+                    N++;
+
+                    i = start + len + 1;
+                } else {
                     i++;
                 }
-
-                // Если серия меньше 2 — пропускаем
-                if (len < 2) {
-                    i++;
-                    continue;
-                }
-
-                // Вставляем первый элемент серии в её конец
-                int insertPos = start + len;
-                int value = arr[start];
-
-                // Сдвиг вправо
-                for (int j = N - 1; j > insertPos; j--) {
-                    arr[j] = arr[j - 1];
-                }
-
-                // Вставка
-                arr[insertPos] = value;
-
-                // Пропускаем вставленный элемент
-                i = insertPos + 1;
 
             } else {
                 i++;
             }
         }
 
-        resultArea.setText("Готово! Массив после обработки:\n" + Arrays.toString(arr));
+        currentArray = arr;
+        resultArea.setText(Arrays.toString(arr));
     }
 
     private void runTask4() {
         int[] arr = currentArray;
-
         if (arr == null || arr.length < 2) {
             resultArea.setText("Сначала сгенерируйте массив");
             return;
         }
 
         int N = arr.length;
+        int start = -1, len = 0;
 
-        int start = -1;   // начало последней серии
-        int len = 0;      // длина последней серии
-
-        // ===== ПОИСК ПОСЛЕДНЕЙ СЕРИИ =====
         int i = N - 1;
-
         while (i > 0) {
+            int a = arr[i], b = arr[i - 1];
 
-            // Проверяем, одинаковый ли знак
-            if ((arr[i] > 0 && arr[i - 1] > 0) ||
-                    (arr[i] < 0 && arr[i - 1] < 0)) {
+            if ((a > 0 && b > 0) || (a < 0 && b < 0)) {
+                int count = 1;
 
-                int end = i;
-                len = 1;
-
-                // Считаем длину серии, двигаясь влево
-                while (i > 0 &&
-                        ((arr[i] > 0 && arr[i - 1] > 0) ||
-                                (arr[i] < 0 && arr[i - 1] < 0))) {
-                    len++;
-                    i--;
+                while (i > 0) {
+                    int x = arr[i], y = arr[i - 1];
+                    if ((x > 0 && y > 0) || (x < 0 && y < 0)) {
+                        count++;
+                        i--;
+                    } else break;
                 }
 
-                start = i;   // i — индекс начала серии
-                break;       // нашли последнюю серию
+                start = i;
+                len = count;
+                break;
             }
 
             i--;
         }
 
-        // ===== ЕСЛИ СЕРИИ НЕТ =====
         if (len < 2) {
-            resultArea.setText("В массиве нет серий одинакового знака длиной ≥ 2");
+            resultArea.setText("Нет серий одинакового знака длиной ≥ 2");
             return;
         }
 
-        // ===== УДАЛЕНИЕ СЕРИИ ЧЕРЕЗ СДВИГ =====
         for (int j = start; j < N - len; j++) {
             arr[j] = arr[j + len];
         }
 
-        // Последние len элементов можно игнорировать (они «стерты» логически)
+        int[] trimmed = Arrays.copyOf(arr, N - len);
+        currentArray = trimmed;
 
-        resultArea.setText(
-                "Последняя серия удалена.\n" +
-                        "Начало серии: " + start + "\n" +
-                        "Длина серии: " + len + "\n\n" +
-                        "Массив после удаления:\n" + Arrays.toString(arr)
-        );
+        resultArea.setText(Arrays.toString(trimmed));
     }
 
-
     private void runTask5() {
+        int[][] a = currentMatrix;
+        if (a == null) {
+            resultArea.setText("Сначала сгенерируйте матрицу");
+            return;
+        }
+
+        int N = a.length;
+
+        int firstPos = -1;
+        for (int c = 0; c < N; c++) {
+            for (int r = 0; r < N; r++) {
+                if (a[r][c] > 0) {
+                    firstPos = c;
+                    break;
+                }
+            }
+            if (firstPos != -1) break;
+        }
+
+        int lastNeg = -1;
+        for (int c = N - 1; c >= 0; c--) {
+            for (int r = 0; r < N; r++) {
+                if (a[r][c] < 0) {
+                    lastNeg = c;
+                    break;
+                }
+            }
+            if (lastNeg != -1) break;
+        }
+
+        if (firstPos == -1 || lastNeg == -1) {
+            resultArea.setText("Нет подходящих столбцов");
+            return;
+        }
+
+        int s1 = 0, s2 = 0;
+        for (int r = 0; r < N; r++) s1 += a[r][firstPos];
+        for (int r = 0; r < N; r++) s2 += a[r][lastNeg];
+        int val = Math.abs(s1 - s2);
+
+        int cols = N;
+
+        int c = 0;
+        while (c < cols) {
+
+            int even = 0;
+            for (int r = 0; r < N; r++) {
+                if (a[r][c] % 2 == 0) even++;
+            }
+
+            if (even > 3) {
+
+                for (int r = 0; r < N; r++) {
+                    a[r] = Arrays.copyOf(a[r], cols + 1);
+                }
+
+                for (int r = 0; r < N; r++) {
+                    for (int j = cols; j > c + 1; j--) {
+                        a[r][j] = a[r][j - 1];
+                    }
+                }
+
+                for (int r = 0; r < N; r++) {
+                    a[r][c + 1] = val;
+                }
+
+                cols++;
+                c += 2;
+            } else {
+                c++;
+            }
+        }
+
+        currentMatrix = a;
+
+        StringBuilder sb = new StringBuilder();
+        for (int r = 0; r < N; r++) {
+            for (int j = 0; j < cols; j++) {
+                sb.append(a[r][j]).append("\t");
+            }
+            sb.append("\n");
+        }
+
+        resultArea.setText(sb.toString());
+    }
+
+    private void runTask6() {
         int[][] matrix = currentMatrix;
 
         if (matrix == null) {
@@ -471,95 +505,38 @@ public class MainController {
 
         int N = matrix.length;
 
-        // ===== 1. Ищем столбец с первым положительным элементом =====
-        int firstPosCol = -1;
-
-        for (int c = 0; c < N; c++) {
-            for (int r = 0; r < N; r++) {
-                if (matrix[r][c] > 0) {
-                    firstPosCol = c;
-                    break;
-                }
-            }
-            if (firstPosCol != -1) break;
-        }
-
-        // ===== 2. Ищем столбец с последним отрицательным элементом =====
-        int lastNegCol = -1;
-
-        for (int c = N - 1; c >= 0; c--) {
-            for (int r = 0; r < N; r++) {
-                if (matrix[r][c] < 0) {
-                    lastNegCol = c;
-                    break;
-                }
-            }
-            if (lastNegCol != -1) break;
-        }
-
-        if (firstPosCol == -1 || lastNegCol == -1) {
-            resultArea.setText("Нет положительных или отрицательных элементов — задача не выполняется");
-            return;
-        }
-
-        // ===== 3. Считаем суммы столбцов =====
-        int sumPos = 0, sumNeg = 0;
+        List<Integer> list = new ArrayList<>();
 
         for (int r = 0; r < N; r++) {
-            sumPos += matrix[r][firstPosCol];
-            sumNeg += matrix[r][lastNegCol];
-        }
-
-        int value = Math.abs(sumPos - sumNeg);
-
-        // ===== 4. Проходим столбцы и вставляем новые =====
-        int c = 0;
-        while (c < N) {
-
-            // считаем чётные
-            int evenCount = 0;
-            for (int r = 0; r < N; r++) {
-                if (matrix[r][c] % 2 == 0) evenCount++;
-            }
-
-            if (evenCount > 3) {
-
-                // ===== 5. Сдвиг вправо =====
-                for (int col = N; col > c + 1; col--) {
-                    for (int row = 0; row < N; row++) {
-                        matrix[row][col] = matrix[row][col - 1];
-                    }
+            for (int c = 0; c < N; c++) {
+                if (r + c > N - 1) {
+                    list.add(matrix[r][c]);
                 }
-
-                // вставляем новый столбец
-                for (int row = 0; row < N; row++) {
-                    matrix[row][c + 1] = value;
-                }
-
-                N++;   // матрица стала шире
-                c += 2; // пропускаем вставленный столбец
-
-            } else {
-                c++;
             }
         }
 
-        // ===== 6. Вывод =====
+        Collections.sort(list);
+
+        int index = 0;
+
+        for (int r = 0; r < N; r++) {
+            for (int c = 0; c < N; c++) {
+                if (r + c > N - 1) {
+                    matrix[r][c] = list.get(index++);
+                }
+            }
+        }
+
         StringBuilder sb = new StringBuilder();
-        for (int r = 0; r < matrix.length; r++) {
-            for (int col = 0; col < matrix.length; col++) {
-                sb.append(matrix[r][col]).append("\t");
+        for (int r = 0; r < N; r++) {
+            for (int c = 0; c < N; c++) {
+                sb.append(matrix[r][c]).append("\t");
             }
             sb.append("\n");
         }
 
         resultArea.setText(sb.toString());
     }
-
-    private void runTask6() {
-
-    }
-    // ===== ВЫПОЛНЕНИЕ ЗАДАНИЯ =====
 
     @FXML
     private void onExecute() {

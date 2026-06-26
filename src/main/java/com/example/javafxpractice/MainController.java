@@ -248,8 +248,11 @@ public class MainController {
             return;
         }
 
+        int N = arr.length;
+
+        // === 1. Найти первый отрицательный элемент ===
         int firstNeg = -1;
-        for (int i = 0; i < arr.length; i++) {
+        for (int i = 0; i < N; i++) {
             if (arr[i] < 0) {
                 firstNeg = i;
                 break;
@@ -260,34 +263,61 @@ public class MainController {
             return;
         }
 
+        // === 2. Найти самую длинную серию чётных элементов ===
         int bestStart = -1, bestLen = 0;
+
         int i = 0;
-        while (i < arr.length) {
+        while (i < N) {
             if (arr[i] % 2 == 0) {
                 int len = 1;
-                while (i + len < arr.length && arr[i + len] % 2 == 0) len++;
+                while (i + len < N && arr[i + len] % 2 == 0) len++;
+
                 if (len >= 2 && len > bestLen) {
                     bestLen = len;
                     bestStart = i;
                 }
+
                 i += len;
-            } else i++;
+            } else {
+                i++;
+            }
         }
 
         if (bestStart == -1) {
-            resultArea.setText("Нет серий из четных элементов длиной ≥ 2");
+            resultArea.setText("Нет серий из чётных элементов длиной ≥ 2");
             return;
         }
 
-        int insertPos = firstNeg + 1;
-        int[] newArr = new int[arr.length + bestLen];
+        // === 3. Проверить, хватает ли места после первого отрицательного ===
+        // Нужно: firstNeg + 1 + bestLen <= N
+        if (firstNeg + 1 + bestLen > N) {
+            resultArea.setText("Недостаточно места после первого отрицательного элемента");
+            return;
+        }
 
-        for (int j = 0; j < insertPos; j++) newArr[j] = arr[j];
-        for (int j = 0; j < bestLen; j++) newArr[insertPos + j] = arr[bestStart + j];
-        for (int j = insertPos; j < arr.length; j++) newArr[j + bestLen] = arr[j];
+        // === 4. Сохранить серию во временный буфер ===
+        int[] temp = new int[bestLen];
+        for (int k = 0; k < bestLen; k++) {
+            temp[k] = arr[bestStart + k];
+        }
 
-        currentArray = newArr;
-        resultArea.setText(Arrays.toString(newArr));
+        // === 5. Удалить серию со старого места (сдвиг влево) ===
+        for (int j = bestStart; j < N - bestLen; j++) {
+            arr[j] = arr[j + bestLen];
+        }
+
+        // === 6. Вставить серию после первого отрицательного (сдвиг вправо) ===
+        // Сдвигаем вправо участок [firstNeg+1 .. N-bestLen-1]
+        for (int j = N - bestLen - 1; j >= firstNeg + 1; j--) {
+            arr[j + bestLen] = arr[j];
+        }
+
+        // === 7. Вставляем сохранённую серию ===
+        for (int k = 0; k < bestLen; k++) {
+            arr[firstNeg + 1 + k] = temp[k];
+        }
+
+        resultArea.setText(Arrays.toString(arr));
     }
 
     private void runTask3() {
@@ -297,29 +327,56 @@ public class MainController {
             return;
         }
 
-        List<Integer> list = new ArrayList<>();
-        for (int x : arr) list.add(x);
+        int N = arr.length;
 
         int i = 0;
-        while (i < list.size() - 1) {
-            int a = list.get(i), b = list.get(i + 1);
-            if ((a % 2 == 0 && b % 2 == 0) || (a % 2 != 0 && b % 2 != 0)) {
-                int start = i, len = 1;
-                while (i + len < list.size()) {
-                    int x = list.get(i + len - 1), y = list.get(i + len);
-                    if ((x % 2 == 0 && y % 2 == 0) || (x % 2 != 0 && y % 2 != 0)) len++;
-                    else break;
+        while (i < N - 1) {
+
+            // Проверяем начало серии
+            if ((arr[i] % 2 == 0 && arr[i + 1] % 2 == 0) ||
+                    (arr[i] % 2 != 0 && arr[i + 1] % 2 != 0)) {
+
+                int start = i;
+                int len = 1;
+
+                // Находим длину серии
+                while (i + len < N &&
+                        ((arr[i + len] % 2 == 0 && arr[i + len - 1] % 2 == 0) ||
+                                (arr[i + len] % 2 != 0 && arr[i + len - 1] % 2 != 0))) {
+                    len++;
                 }
+
                 if (len >= 2) {
-                    list.add(start + len, list.get(start));
+                    // Нужно вставить arr[start] в позицию start + len
+                    // Но сначала — сдвиг вправо
+
+                    // Увеличиваем массив на 1 (это допустимо, т.к. сам сдвиг делаем вручную)
+                    arr = Arrays.copyOf(arr, N + 1);
+
+                    // Сдвигаем вправо хвост
+                    for (int j = N; j > start + len; j--) {
+                        arr[j] = arr[j - 1];
+                    }
+
+                    // Вставляем первый элемент серии
+                    arr[start + len] = arr[start];
+
+                    // Обновляем длину массива
+                    N++;
+
+                    // Перескакиваем через вставленную серию
                     i = start + len + 1;
-                } else i++;
-            } else i++;
+                } else {
+                    i++;
+                }
+
+            } else {
+                i++;
+            }
         }
 
-        int[] res = list.stream().mapToInt(Integer::intValue).toArray();
-        currentArray = res;
-        resultArea.setText(Arrays.toString(res));
+        currentArray = arr;
+        resultArea.setText(Arrays.toString(arr));
     }
 
     private void runTask4() {
@@ -335,8 +392,10 @@ public class MainController {
         int i = N - 1;
         while (i > 0) {
             int a = arr[i], b = arr[i - 1];
+
             if ((a > 0 && b > 0) || (a < 0 && b < 0)) {
                 int count = 1;
+
                 while (i > 0) {
                     int x = arr[i], y = arr[i - 1];
                     if ((x > 0 && y > 0) || (x < 0 && y < 0)) {
@@ -344,10 +403,12 @@ public class MainController {
                         i--;
                     } else break;
                 }
+
                 start = i;
                 len = count;
                 break;
             }
+
             i--;
         }
 
@@ -356,13 +417,16 @@ public class MainController {
             return;
         }
 
-        int[] newArr = new int[N - len];
-        for (int j = 0; j < start; j++) newArr[j] = arr[j];
-        for (int j = start; j < newArr.length; j++) newArr[j] = arr[j + len];
+        for (int j = start; j < N - len; j++) {
+            arr[j] = arr[j + len];
+        }
 
-        currentArray = newArr;
-        resultArea.setText(Arrays.toString(newArr));
+        int[] trimmed = Arrays.copyOf(arr, N - len);
+        currentArray = trimmed;
+
+        resultArea.setText(Arrays.toString(trimmed));
     }
+
 
     private void runTask5() {
         int[][] a = currentMatrix;
@@ -373,6 +437,7 @@ public class MainController {
 
         int N = a.length;
 
+        // === 1. Найти первый столбец с положительным элементом ===
         int firstPos = -1;
         for (int c = 0; c < N; c++) {
             for (int r = 0; r < N; r++) {
@@ -384,6 +449,7 @@ public class MainController {
             if (firstPos != -1) break;
         }
 
+        // === 2. Найти последний столбец с отрицательным элементом ===
         int lastNeg = -1;
         for (int c = N - 1; c >= 0; c--) {
             for (int r = 0; r < N; r++) {
@@ -400,40 +466,61 @@ public class MainController {
             return;
         }
 
+        // === 3. Считаем сумму столбцов ===
         int s1 = 0, s2 = 0;
         for (int r = 0; r < N; r++) s1 += a[r][firstPos];
         for (int r = 0; r < N; r++) s2 += a[r][lastNeg];
         int val = Math.abs(s1 - s2);
 
-        int[][] m = a;
-        int cols = N;
+        int cols = N; // текущее количество столбцов
 
-        for (int c = 0; c < cols; c++) {
+        // === 4. Проходим по столбцам и вставляем новые ===
+        int c = 0;
+        while (c < cols) {
+
+            // считаем количество чётных в столбце
             int even = 0;
-            for (int r = 0; r < N; r++) if (m[r][c] % 2 == 0) even++;
+            for (int r = 0; r < N; r++) {
+                if (a[r][c] % 2 == 0) even++;
+            }
 
             if (even > 3) {
-                int[][] newM = new int[N][cols + 1];
 
+                // === 4.1 Расширяем каждую строку на 1 столбец ===
                 for (int r = 0; r < N; r++) {
-                    for (int cc = 0; cc <= c; cc++) newM[r][cc] = m[r][cc];
-                    newM[r][c + 1] = val;
-                    for (int cc = c + 1; cc < cols; cc++) newM[r][cc + 1] = m[r][cc];
+                    a[r] = Arrays.copyOf(a[r], cols + 1);
                 }
 
-                m = newM;
-                cols++;
+                // === 4.2 Сдвигаем вправо столбцы справа от c ===
+                for (int r = 0; r < N; r++) {
+                    for (int j = cols; j > c + 1; j--) {
+                        a[r][j] = a[r][j - 1];
+                    }
+                }
+
+                // === 4.3 Вставляем новый столбец ===
+                for (int r = 0; r < N; r++) {
+                    a[r][c + 1] = val;
+                }
+
+                cols++;   // увеличилось количество столбцов
+                c += 2;   // пропускаем вставленный столбец
+            } else {
                 c++;
             }
         }
 
-        currentMatrix = m;
+        currentMatrix = a;
 
+        // === вывод ===
         StringBuilder sb = new StringBuilder();
         for (int r = 0; r < N; r++) {
-            for (int c = 0; c < m[0].length; c++) sb.append(m[r][c]).append("\t");
+            for (int j = 0; j < cols; j++) {
+                sb.append(a[r][j]).append("\t");
+            }
             sb.append("\n");
         }
+
         resultArea.setText(sb.toString());
     }
 
